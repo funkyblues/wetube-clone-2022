@@ -1,0 +1,16 @@
+{
+  "name": "wetube-clone-2022",
+  "version": "1.0.0",
+  "description": "The best way to watch videos.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/funkyblues/wetube-clone-2022.git"
+  },
+  "author": "Changuk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/funkyblues/wetube-clone-2022/issues"
+  },
+  "homepage": "https://github.com/funkyblues/wetube-clone-2022#readme"
+}

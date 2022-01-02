@@ -1,2 +1,2 @@
 # wetube-clone-2022
-유튜브 클론코딩 2022
+Wetube Clone built using NodeJS, Express, MongoDB and ES6
