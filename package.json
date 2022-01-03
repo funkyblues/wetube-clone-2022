@@ -7,7 +7,7 @@
     "url": "git+https://github.com/funkyblues/wetube-clone-2022.git"
   },
   "scripts": {
-    "dev": "nodemon --exec npx babel-node index.js"
+    "dev": "nodemon --exec npx babel-node src/server.js"
   },
   "author": "Changuk",
   "license": "MIT",
