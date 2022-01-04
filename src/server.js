@@ -1,35 +1,37 @@
 import express from "express";
+import { handle } from "express/lib/application";
 import morgan from "morgan";
 
 const PORT = 4000;
 
 const app = express();
-// const logger = morgan("dev");
-// const logger = morgan("common");
-// const logger = morgan("short");
-const logger = morgan("tiny");
-
-
-const privateMiddleware = (req, res, next) => {
-  const url = req.url;
-  if (url === "/protected") {
-    return res.send("<h1>Not Allowed</h1>");
-  }
-  console.log("Allowed, you may continue.");
-  next();
-}
-
-const handleHome = (req, res, next) => {
-  return res.send("I love middlewares");
-}
-const handleProtected = (req, res) => {
-  return res.send("Welcome to the private lounge.");
-}
-
+const logger = morgan("dev");
 app.use(logger);
-app.use(privateMiddleware);
-app.get("/", handleHome);
-app.get("/protected", handleProtected);
+
+// 라우터(ROUTER) 생성!
+const globalRouter = express.Router();
+const handleHome = (req, res) => res.send("Home");
+
+// 서버가 GET request에 응답할 수 있도록
+globalRouter.get("/", handleHome);
+
+const userRouter = express.Router();
+const handleEditUser = (req, res) => res.send("Edit User");
+
+// 서버가 GET request에 응답할 수 있도록
+userRouter.get("/edit", handleEditUser);
+
+const videoRouter = express.Router();
+const handleWatchVideo = (req, res) => res.send("Watch Video");
+
+// 서버가 GET request에 응답할 수 있도록
+videoRouter.get("/watch", handleWatchVideo);
+
+// 라우터(ROUTER) 사용!
+app.use("/", globalRouter);
+app.use("/videos", videoRouter);
+app.use("/users", userRouter);
+
 
 app.listen(PORT, () => console.log(`✔ Server listening on port http://localhost:${PORT} 🚀`));
 

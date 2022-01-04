@@ -1,31 +1,17 @@
 # Wetube-clone-2022
 Wetube Clone built using NodeJS, Express, MongoDB and ES6
 
-라우터(router)
-- 작업중인 주제 기반으로 URL을 그룹화해줌
-- / : global router
-- /users/ : users router
-- /videos/ : videos router
-
+<!-- users에 join login을 넣기 보단, 약간의 예외를 둬서 보기 깔끔하도록 -->
+<!-- GLOBAL ROUTER -->
 / -> Home
 /join -> Join
 /login -> Login
 /search -> Search
-
-<!-- /users/edit -->
-/edit-user -> Edit user
-
-<!-- /users/delete -->
-/delete-user -> Delete user
-
-<!-- /videos/watch -->
-/watch-video -> Watch Video
-
-<!-- /videos/edit -->
-/edit-video -> Edit Video
-
-<!-- /videos/delete -->
-/delete-video -> Delete Video
-
+<!-- USERS ROUTER -->
+/users/edit -> Edit user
+/users/delete -> Delete user
+<!-- VIDEOS ROUTER -->
+/videos/watch -> Watch Video
+/videos/edit -> Edit Video
+/videos/delete -> Delete Video
 /videos/comments -> Comment on a video
-/videos/comments/delete -> Delete A Comment of a Video
