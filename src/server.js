@@ -10,10 +10,8 @@ const PORT = 4000;
 const app = express();
 //middleware도 request, response, next가 필요!
 const gossipMiddleware = (req, res, next) => {
-  // console.log("I'm in the middle!");
-  
-  return res.send("I have the power now!");
-  // 이렇게 되면 next()를 호출하지 못하고, 바로 response해버려서 GET request가 종료됨
+  // 어디로 가는지 알려주는 middleware
+  console.log(`Someone is going to: ${req.url}`);
   next();
 }
 
