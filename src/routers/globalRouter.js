@@ -1,14 +1,12 @@
 import express from "express";
+import join from "../controllers/userController";
+import trending from "../controllers/videoController";
 
 // GLOBALROUTER 생성
 const globalRouter = express.Router();
 
-// handler(controller) 정의
-const handleHome = (req, res) => res.send("Home");
-const handleJoin = (req, res) => res.send("Join");
-
 // GET method 구현
-globalRouter.get("/", handleHome);
-globalRouter.get("/join", handleJoin);
+globalRouter.get("/", trending);
+globalRouter.get("/join", join);
 
 export default globalRouter;

@@ -1,3 +1,5 @@
+// Router와 Controller는 섞으면 안좋음
+// Controller는 함수이기 때문! Router는 함수를 이용하는 입장.
 import express from "express";
 import morgan from "morgan";
 import globalRouter from "./routers/globalRouter";
@@ -14,9 +16,6 @@ app.use(logger);
 
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
-// 또 한번 설명.
-// 만약 서버가 /users/edit라는 URL을 보게 되면, userRouter를 실행하게 된다.
-// 그 후 userRouter 안에서 /edit을 찾게 된다.
 app.use("/users", userRouter);
 
 
