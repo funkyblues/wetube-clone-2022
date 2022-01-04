@@ -1,5 +1,3 @@
-// Router와 Controller는 섞으면 안좋음
-// Controller는 함수이기 때문! Router는 함수를 이용하는 입장.
 import express from "express";
 import morgan from "morgan";
 import globalRouter from "./routers/globalRouter";
