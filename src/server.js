@@ -1,24 +1,47 @@
 import express from "express";
 
+// middlewars는 request와 response사이에 존재.
+// (기억) 모든 middlewars(Controllers)는 handler고 모든 handler는 middleware(Controllers)다
+// 지금부터 handler대신 controller라고 용어 사용 (MVC)
+// middleware는 작업을 다음 함수에게 넘기는 함수. 응답하는 함수가 아님. Not response.
+// middleware는 필요한 만큼 만들 수 있음.
+
 const PORT = 4000;
-
 const app = express();
+//middleware도 request, response, next가 필요!
+const gossipMiddleware = (req, res, next) => {
+  // console.log("I'm in the middle!");
+  
+  return res.send("I have the power now!");
+  // 이렇게 되면 next()를 호출하지 못하고, 바로 response해버려서 GET request가 종료됨
+  next();
+}
 
-// express의 route handler는 event는 없지만, 2개의 object를 받을 수 있다.
-// req, res. -> express로 부터 받은 것
+// 원래 controller에는 req, res 말고 next라는 argument가 있다.
+// next argument는 next function을 호출해준다.
+const handleHome = (req, res, next) => {
+  // next();
+  // cannot get /
+  // app.get("/", handleHome) 다음에 함수가 없으므로, 접속 자체가 안되는 것이다.
+  // next() 를 사용할 수 있게 middleware를 만들어보자
 
-const handleHome = (req, res) => {
-  return res.send("<h1>I still love you.</h1>");
+  // 여기서 handleHomer은 return 하니까, final function
+  return res.send("I love middlewares");
 }
 
 const handleLogin = (req, res) => {
-  // JSON 형식으로 보내줄 수도 있다 ㅋㅋ
-  // 응답은 필수. 응답하지 않으면 브라우저는 계속 기다림 (아니면 포기)
   return res.send({message: "Login here."});
 }
 
-app.get("/", handleHome);
-app.get("/login", handleLogin);
+// 함수의 signature. app.get은 url을 먼저 요청(require)하고, 그 다음 handler를 호출한다.
+// 다수의 handlers 사용 가능!
+app.get("/", gossipMiddleware, handleHome);
+
+// 모든 controller는 middleware가 될 수 있다.
+// 함수가 next() (함수)를 호출한다면, 함수는 middleware라는 것을 의미한다.
+
+
+// app.get("/login", handleLogin);
 
 
 app.listen(PORT, () => console.log(`✔ Server listening on port ${PORT} 🚀`));
