@@ -4,9 +4,11 @@ import express from "express";
 const videoRouter = express.Router();
 
 // handler(controller) 정의
-const handleWatchVideo = (req, res) => res.send("Watch Video");
+const handleWatch = (req, res) => res.send("Watch Video");
+const handleEdit = (req, res) => res.send("Edit Video");
 
 // GET method 구현
-videoRouter.get("/watch", handleWatchVideo);
+videoRouter.get("/watch", handleWatch);
+videoRouter.get("/edit", handleEdit);
 
 export default videoRouter;
