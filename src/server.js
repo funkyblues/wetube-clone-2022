@@ -8,20 +8,13 @@ const app = express();
 // req, res. -> express로 부터 받은 것
 
 const handleHome = (req, res) => {
-  // console.log(req);
-  // console.log(res);
-
-
-  // request를 종료하는 방법 중 하나!
-  // return res.end(); // return으로 함수가 종료되어서 request를 종료!
-
-  // 다른 방법
-  // 서버가 res에 send 메서드를 활용하여 메시지 보냄
-  return res.send("I still love you");
+  return res.send("<h1>I still love you.</h1>");
 }
 
 const handleLogin = (req, res) => {
-  return res.send("Login here.");
+  // JSON 형식으로 보내줄 수도 있다 ㅋㅋ
+  // 응답은 필수. 응답하지 않으면 브라우저는 계속 기다림 (아니면 포기)
+  return res.send({message: "Login here."});
 }
 
 app.get("/", handleHome);
