@@ -4,6 +4,21 @@ html(lang="ko")
     title #{pageTitle} | WeTube
     link(rel="stylesheet" href="https://unpkg.com/mvp.css")
   body 
+    header 
+      if fakeUser.loggedIn
+        small Hello #{fakeUser.username}
+      nav 
+        ul 
+          if fakeUser.loggedIn
+            li
+              a(href="/logout") Log Out
+          else
+            li 
+              a(href="/login") Login
+
+      //- 이렇게 쓰면 text가 아닌 variable로 인식된다.
+      //- #{pageTitle}과 같음.
+      h1=pageTitle
     main
       block content
     include partials/footer.pug
