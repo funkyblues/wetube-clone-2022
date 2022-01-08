@@ -1,11 +1,10 @@
-//  1. 가짜 DB에 있는 모든 비디오들을 나열하고 싶다.
 let videos = [
   {
     title: "First Video",
     rating: 5,
     comments: 2,
     createdAt: "2 minutes ago",
-    views: 59,
+    views: 3,
     id: 1,
   },
   {
@@ -30,7 +29,7 @@ export const trending = (req, res) => {
   return res.render("home", { pageTitle: "Home", videos })
 };
 // 2. 유저가 오직 하나의 비디오를 볼 수 있으면 좋겠다.
-export const see = (req, res) => {
+export const watch = (req, res) => {
   // console.log(req.params);
   // req.params로 id값을 얻을 수 있다! {id: '1'}
   
@@ -41,7 +40,7 @@ export const see = (req, res) => {
 
   // console.log("Show video", id);
   const video = videos[id - 1]; // videos array안에 id가 0부터 시작하니까~
-  return res.render("watch", { pageTitle: `Watching ${video.title}` });
+  return res.render("watch", { pageTitle: `Watching ${video.title}`, video });
 };
 export const edit = (req, res) => res.render("edit");
 export const search = (req, res) => res.send("Search");
