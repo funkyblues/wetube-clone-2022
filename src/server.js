@@ -16,6 +16,7 @@ const logger = morgan("dev");
 // views : app의 뷰에 대한 디렉토리나 배열을 담고 있음. 
 // 뷰, html, 텍스트는 같은거.
 app.set("view engine", "pug");
+app.set("views", process.cwd() + "/src/views");
 app.use(logger);
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
