@@ -1,11 +1,7 @@
-doctype html 
-html(lang="ko")
-  head
-    title Wetube 
-  body 
-    h1 Watch Video!
-    //- pug에서 javascript를 사용하는 방법! -> #
-    //- footer &copy; #{new Date().getFullYear()} Wetube
+extends base.pug
 
-    //- watch.pug가 있는 위치에서 경로 설정
-    include partials/footer.pug
+block head
+  title Watch | Wetube
+
+block content
+  h1 Watch Video!
