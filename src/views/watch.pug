@@ -1,8 +1,5 @@
 extends base.pug
 
 block content
-  //- ternary operator (삼항 연산자)
   h3 #{video.views} #{video.views === 1 ? "view": "views"}
-  //- edit 앞에 /만 있으면 root경로에 + /edit 이렇게 된다. (절대 경로)
-  //- edit 앞에 아무것도 없으면 상대 경로가 된다.
   a(href=`${video.id}/edit`) Edit Video &rarr;
