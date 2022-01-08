@@ -49,7 +49,17 @@ export const getUpload = (req, res) => {
 }
 
 export const postUpload = (req, res) => {
-  // here we will add a video to the videos array.
+  const { title } = req.body;
+  const newVideo = {
+    // const title = req.body.title 이렇게 적어도 되는데, 더 줄여서 쓴 것!
+    title,
+    rating: 0,
+    comments: 0,
+    createdAt: "just now",
+    views: 0,
+    id: videos.length + 1,
+  };
+  videos.push(newVideo);
   return res.redirect("/");
 }
 
