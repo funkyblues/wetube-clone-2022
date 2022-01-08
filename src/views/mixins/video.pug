@@ -1,0 +1,14 @@
+//- 같은 형태의 블록을 가지지만 서로 다른 데이터를 가져야 한다면? 
+//- Mixins를 사용 (Mixins는 똑똑한 partial이다.)
+
+//- info는 mixin이 받게 될 data!
+
+//- HTML을 return 해주는 일종의 function을 가지게 된다.
+mixin video(info) 
+  div 
+    h4=info.title
+    ul 
+      li #{info.rating}/5.
+      li #{info.comments} comments.
+      li Posted #{info.createdAt}
+      li #{info.views} views.
