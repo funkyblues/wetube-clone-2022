@@ -2,19 +2,7 @@ extends base.pug
 
 block content
   h4 Change Title of video
-  //- action에 들어갈 값은 이 데이터를 어디로 보낼 것인가 이다.
-  //- 내 서버가 가져야 할 url을 넣어주면 된다.
-
-  //- GET과 POST의 차이??
   form(method="POST")
-    //- input에 name을 주면 url에 title이 표시됨. ex. First+Video
-    //- GET을 사용할 때,
-      //- 구글이나 네이버에서 뭔가 검색할 때, 검색어가 주소창에 포함
-      //- name="title"로 써서 url에 포함되는 것 처럼
-    //- POST를 사용할 때,
-      //- 파일을 보내거나, database에 있는 값을 바꾸는 뭔가를 보낼 때 사용.
-    
-    
-    //- 현재 우리 서버는 POST에 대해서 모르니 알려줘야 함.
+    //-  name="fdsa"가 없으면 req.body는 비어있음.
     input(name="title", placeholder="Video Title", value=video.title, required)
     input(value="Save", type="submit")
