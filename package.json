@@ -17,6 +17,7 @@
   "homepage": "https://github.com/funkyblues/wetube-clone-2022#readme",
   "dependencies": {
     "express": "^4.17.2",
+    "mongoose": "^6.1.5",
     "morgan": "^1.10.0",
     "pug": "^3.0.2"
   },
