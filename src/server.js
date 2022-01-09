@@ -1,4 +1,7 @@
 import "./db";
+import "./models/Video";
+// 이 연결로 db는 우리 video model을 인지!
+// db를 mongoose와 연결시켜서 video model을 인식시키게 됨.
 
 import express from "express";
 import morgan from "morgan";
