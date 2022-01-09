@@ -1,47 +1,35 @@
-let videos = [
-  {
-    title: "First Video",
-    rating: 5,
-    comments: 2,
-    createdAt: "2 minutes ago",
-    views: 3,
-    id: 1,
-  },
-  {
-    title: "Second Video",
-    rating: 5,
-    comments: 2,
-    createdAt: "2 minutes ago",
-    views: 59,
-    id: 2,
-  },
-  {
-    title: "Third Video",
-    rating: 5,
-    comments: 2,
-    createdAt: "2 minutes ago",
-    views: 59,
-    id: 3,
-  },
-];
+import Video from "../models/Video";
 
-export const trending = (req, res) => { 
-  return res.render("home", { pageTitle: "Home", videos })
+
+export const home = (req, res) => { 
+  // Video.find();
+  // 사용하기 위한 방식으로는 callback, promise 두 가지가 있다. 이게 뭐임???
+
+  // init.js 부분에 callback을 간략히 요약함.
+  // Video도 마찬가지로, 만약 callback 방식으로 사용하려면, 데이터가 전송되는 것을 기다려야 한다.
+  // 우리가 받는 데이터는 javascript 파일 속에 없기 때문에. -> 이게 DB임.
+
+  // Video.find()의 경우, database의 상황에 따라 전송속도가 느릴 수 있다. javascript 밖에 있기 때문에.
+  // 약간의 기다림이 필요하다.
+  // 먼저 callback방식으로 사용하는 법 부터.
+
+  Video.find({}, (err, docs) => {});
+  // search terms가 {}로 비어있으면 모든 형식을 찾는다는 것을 뜻함.
+  // 그 다음으로 callback을 전송. 이 callback은 err, docs라는 signature를 가짐.
+
+  return res.render("home", { pageTitle: "Home" })
 };
 export const watch = (req, res) => {
   const id = req.params.id;
-  const video = videos[id - 1]; 
-  return res.render("watch", { pageTitle: `Watching : ${video.title}`, video });
+  return res.render("watch", { pageTitle: "Watching"});
 };
 export const getEdit = (req, res) => {
   const id = req.params.id;
-  const video = videos[id - 1]; 
-  res.render("edit", { pageTitle:`Editing : ${video.title}`, video });
+  res.render("edit", { pageTitle: "Editing"});
 }
 export const postEdit = (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
-  videos[id - 1].title = title;
   return res.redirect(`/videos/${id}`);
 }
 export const getUpload = (req, res) => {
@@ -50,16 +38,6 @@ export const getUpload = (req, res) => {
 
 export const postUpload = (req, res) => {
   const { title } = req.body;
-  const newVideo = {
-    // const title = req.body.title 이렇게 적어도 되는데, 더 줄여서 쓴 것!
-    title,
-    rating: 0,
-    comments: 0,
-    createdAt: "just now",
-    views: 0,
-    id: videos.length + 1,
-  };
-  videos.push(newVideo);
   return res.redirect("/");
 }
 
