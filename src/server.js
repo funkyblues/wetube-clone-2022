@@ -1,8 +1,3 @@
-// 파일 그 자체를 import!!
-// server.js가 이 라인을 보는 순간, import해줌으로써 mongo에 연결 될 것.
-
-// 그러나 서버가 시작되고 난 후 database에 연결된다.
-// 이유는 database가 더 느리기 떄문?
 import "./db";
 
 import express from "express";
