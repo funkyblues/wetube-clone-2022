@@ -1,18 +1,19 @@
 import mongoose from "mongoose";
 
 const videoSchema = new mongoose.Schema({
-  title: {type: String, required: true}, //{type: String}
-  description: {type: String, required: true}, //{type: String}
-  createdAt: {type:Date, required: true, default: Date.now },
-  // 그런데 수많은 model에 각각 이렇게 해주는게 끔찍할 수 있다.... 그러니 default를 사용!
-  // Date.now에 ()를 하지 않는 것이 중요. ()해주면 function을 즉각 실행할 것.
-  // 그게 아닌 Mongoose가 알아서 Date.now를 실행해주도록 하기 위함.
+  // 최대, 최소 문자길이를 설정해주었다. 여기까지만 하면 에러가 조금 생길거임.
+  // (사용자랑 해당 코드가 잘 연결되어 있지 않다면 말여.)
 
-  // 이렇게 해주고 실행하면 생성한 video가 createdAt항목을 가지고 있지 않아도
-  // 오류가 발생하지 않고 새로운 video를 생성해준다!
-  hashtags: [{type: String}],
+  // 근데 html input에서 제어해줄 수 있는데 굳이 이걸 왜 database에 알려줘야 함??
+  // 답은, 둘 다 해줘야 한다.
+
+  // 만약 누군가가 웹사이트에서 html input 에서 삭제한다면, 해당 기능이 사라지기 때문...
+  // 그래서 DB에도 설정을 해주어야 한다는 뜻.
+  title: {type: String, required: true, trim: true, maxlength: 80}, 
+  description: {type: String, required: true, trim: true, minLength: 20}, 
+  createdAt: {type:Date, required: true, default: Date.now },
+  hashtags: [{type: String, trim: true}],
   meta: {
-    // 이렇게 default를 쓰면 required가 무쓸모다~~
     views: {type: Number, default: 0, required: true},
     rating: {type: Number, default: 0, required: true},
   },
