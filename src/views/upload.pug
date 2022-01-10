@@ -1,5 +1,7 @@
 extends base.pug
 block content 
+  if errorMessage 
+    span=errorMessage
   form(method="POST")
     input(name="title" placeholder="Title", required, type="text")
     //- 새로운 inputs 추가
