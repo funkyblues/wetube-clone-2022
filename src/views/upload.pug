@@ -2,6 +2,7 @@ extends base.pug
 block content 
   form(method="POST")
     input(name="title" placeholder="Title", required, type="text")
-    //- submit을 누르면, POST request는 현재 url로 보내진다. 
-    //- 현재 url : /videos/upload
+    //- 새로운 inputs 추가
+    input(name="description" placeholder="Description", required, type="text")
+    input(name="hashtags" placeholder="Hashtags, seperated by comma.", required, type="text")
     input(type="submit", value="Upload Video")
