@@ -1,5 +1,13 @@
 extends base.pug
 
 block content
-  h3 #{video.views} #{video.views === 1 ? "view": "views"}
+  //- video안에 views가 없다.
+  //- 왜냐? 우리는 video를 전송하지 않고 있음. (videoCOntroller watch 참조!)
+
+  //- h3 #{video.views} #{video.views === 1 ? "view": "views"}
+  
+  div
+    p=video.description
+    small=video.createdAt
+  
   a(href=`${video.id}/edit`) Edit Video &rarr;

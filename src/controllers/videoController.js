@@ -1,3 +1,6 @@
+ //정규식에 대한 MDN의 공식 문서 
+ // https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_Expressions
+
 import Video from "../models/Video";
 
 export const home = async(req, res) => {
@@ -5,9 +8,16 @@ export const home = async(req, res) => {
   console.log(videos);
   return res.render("home", { pageTitle: "Home", videos });
 };
-export const watch = (req, res) => {
-  const id = req.params.id;
-  return res.render("watch", { pageTitle: "Watching"});
+export const watch = async (req, res) => {
+  // request가 가져오는 params들 중 id를 찾을 수 있는 라인이지 요게.
+  // const id = req.params.id;
+  const { id } = req.params;
+
+  // mongoose documentation 참조! 
+  // async가 없으면 await를 쓸 수 없다~
+  const video = await Video.findById(id);
+  // console.log(video);
+  return res.render("watch", { pageTitle: video.title, video});
 };
 export const getEdit = (req, res) => {
   const id = req.params.id;
