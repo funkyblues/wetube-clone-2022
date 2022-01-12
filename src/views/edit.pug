@@ -3,14 +3,7 @@ extends base.pug
 block content
   h4 Update Video
   form(method="POST")
-    //- placeholder에 video.title 값을 넣어줬으므로, 제목이 나온다!
     input(name="title", placeholder="Video Title", value=video.title, required)
     input(name="description" placeholder="Description", required, type="text", minlength=20, value=video.description)
     input(name="hashtags" placeholder="Hashtags, seperated by comma.", required, type="text", value=video.hashtags.join())
-    //- 근데 이렇게 하면 hashtags들이 
-    //- ["#for", "#real", ...] 뭐 이런식으로 나온다 ㅋㅋ
-    //- 왜냐면 hashtags는 array니까. (Video.js 참조.)
-    //- 그러니 hashtags를 string으로 포맷팅해야함.
-    //- ["#for", "#real", ...].join()을 쓰면 깔끔하게 해결된다.
-    //- join() 이 뭔가? -> 찾아보기.
     input(value="Save", type="submit")
