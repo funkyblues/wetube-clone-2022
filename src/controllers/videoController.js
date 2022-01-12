@@ -5,7 +5,7 @@ import Video from "../models/Video";
 
 export const home = async(req, res) => {
   const videos = await Video.find({});
-  console.log(videos);
+  // console.log(videos);
   return res.render("home", { pageTitle: "Home", videos });
 };
 export const watch = async (req, res) => {
@@ -74,7 +74,7 @@ export const postEdit = async (req, res) => {
   // 영상 title, description, hashtags들을 수정.
   video.title = title;
   video.description = description;
-  video.hashtags = hashtags.split(",").map((word) => `#${word}`);
+  video.hashtags = hashtags.split(",").map((word) => word.startsWith("#") ? word : `#${word}`);
 
   // 그러나 여전히 오류가 날 것이다. 왜냐? 우리가 #을 추가하고 있는데,
   // 이미 #이 다 달려있기 때문이지. -> hashtags 관련 function들을 손 봐야 한다.
@@ -107,7 +107,8 @@ export const postUpload = async (req, res) => {
 
 
       // (이렇게 코드를 복붙하는 게 좋은 방법은 아니다)
-      hashtags: hashtags.split(",").map((word) => `#${word}`),
+      // 다음 영상에선 영상을 만들고 저장하는 것을 하나의 function에서 마무리 할 것.
+      hashtags: hashtags.split(",").map((word) => word.startsWith("#") ? word : `#${word}`),
     });
     return res.redirect("/");
   }
