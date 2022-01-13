@@ -6,7 +6,8 @@
 import Video from "../models/Video";
 
 export const home = async(req, res) => {
-  const videos = await Video.find({});
+  // 생성 시간으로 정렬하기 위해 내림차순 정렬 (desc)
+  const videos = await Video.find({}).sort({ createdAt: "desc" });
   return res.render("home", { pageTitle: "Home", videos });
 };
 export const watch = async (req, res) => {
@@ -89,4 +90,15 @@ export const deleteVideo = async (req, res) => {
   // delete와 remove의 차이점??? 찾아보삼.
   // 특별한 이유 있지 않은 이상 delete를 쓰래 mongodb는 롤백이 안되서 remove하면 되돌릴 수 없다고...
   return res.redirect("/");
+}
+
+export const search = (req, res) => {
+  // console.log(req.query);
+  const { keyword } = req.query;
+  console.log("should search for ", keyword);
+  // 그러나 항상 keyword가 존재하는건 아닐 수 있음
+  // 단순히 그냥 search 페이지로 갈 땐 keyword 없다.
+  // 그러니 조건문이 필요
+
+  return res.render("search", { pageTitle:"Search" });
 }
