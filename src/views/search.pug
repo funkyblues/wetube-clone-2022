@@ -1,6 +1,6 @@
 //- base.pug를 extends하는 것이기 때문에, pageTitle변수를 지정해 줘야 하는 것.
-
 extends base
+include mixins/video
 
 block content 
   form(method="GET")
@@ -10,3 +10,6 @@ block content
     //- req.query로 url에 찍히게 되는(?) keyword 정보를 받을 수 있다.
     //- (req.query는 URL data를 위한 명령)
     input(type="submit", value="Search now")
+
+  each video in videos 
+    +video(video)

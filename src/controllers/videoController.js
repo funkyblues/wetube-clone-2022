@@ -92,13 +92,62 @@ export const deleteVideo = async (req, res) => {
   return res.redirect("/");
 }
 
-export const search = (req, res) => {
+export const search = async (req, res) => {
   // console.log(req.query);
   const { keyword } = req.query;
-  console.log("should search for ", keyword);
+  // console.log("should search for ", keyword);
+  let videos = [];
   // 그러나 항상 keyword가 존재하는건 아닐 수 있음
   // 단순히 그냥 search 페이지로 갈 땐 keyword 없다.
   // 그러니 조건문이 필요
+  if (keyword) {
+    // 어떤 것이든 찾겠다
+    videos = await Video.find({
+      title: {
+        // 이렇게 regular expression을 보낼 수 있다.
 
-  return res.render("search", { pageTitle:"Search" });
+        // 대소문자 차이 없게하기 위한 i
+        // ex. $gt: 3 (greater than 3... 이렇게 쓸 수도 있음.)
+        // 이렇게 RegExp안에 keyword를 넣게 되면, contain 방식의 regular expression을 생성하게 된다.
+        // 그 말은 제목에 keyword를 포함하는 영상들을 찾을 거라는 소리.
+        // 잘 작동한다!!
+
+        // 만약 시작 단어만 맞는 영상을 찾으려면...
+        // $regex: new RegExp(`^${keyword}`, "i") 
+        // 이렇게 하면된다
+
+        // 만약 끝나는 단어로 영상을 찾으려면...
+        // $regex: new RegExp(`${keyword}`, "i"),
+
+        // 이것들은 다 mongodb가 지원해주는 operator!
+
+
+        $regex: new RegExp(keyword, "i")
+      },
+      // 제목과 정확히 일치하면 보여줌.
+      // 잘 작동하긴 하지만, 제목을 다 치긴 싫기 때문에, regular expression을 써서 검색하겠다.
+      // regex 공부를 위해선, https://www.regextester.com/ 여기 참조
+
+      // 특정 단어로 시작하는 문장을 찾고 싶다
+      /*ex
+      regex: ^welcome/ig
+
+      welcome how are you -> pick
+      hello and welcome*/
+      // 특정 단어로 끝나는 문장을 찾고 싶다
+      /*ex
+      regex: welcome$/ig
+
+      welcome how are you
+      hello and welcome -> pick */
+    });
+
+    // 배열로 만들어진 videos를 볼 수 있다 ㅎㅎ.
+    console.log(videos);
+  }
+  // 여기엔 videos가 존재하지 않기 때문에... 이렇게 작성할 수 밖에 없다.
+  // 다른 방법으론 조건문 바깥에 let으로 videos 배열을 정의하는 방법이 있다.
+  // let videos = [];
+  // 이걸로 바꾸도록 하자.
+  return res.render("search", { pageTitle:"Search", videos});
 }
