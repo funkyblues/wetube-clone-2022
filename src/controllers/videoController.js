@@ -75,3 +75,18 @@ export const postUpload = async (req, res) => {
     return res.render("upload", { pageTitle: "Upload Video", errorMessage: error._message, });
   }
 };
+
+
+export const deleteVideo = async (req, res) => {
+  // videoRouter의 deleteVideo URL을 받아와서 id를 가져올 것이다.
+  // 먼저 id를 보자.
+  const { id } = req.params;
+  console.log(id);
+  // id는 잘 받아진당.
+  // delete video
+  await Video.findByIdAndDelete(id);
+  // 오~~ 잘 됨 ㅎㅎㅎ
+  // delete와 remove의 차이점??? 찾아보삼.
+  // 특별한 이유 있지 않은 이상 delete를 쓰래 mongodb는 롤백이 안되서 remove하면 되돌릴 수 없다고...
+  return res.redirect("/");
+}

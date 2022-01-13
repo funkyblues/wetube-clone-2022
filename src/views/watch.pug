@@ -7,3 +7,8 @@ block content
     small=video.createdAt
   
   a(href=`${video.id}/edit`) Edit Video &rarr;
+  br
+  //- 이번에는 post하지 않을 것이다. 단순히 URL방문 할 것임.
+  //- 이 URL을 방문하면 영상 삭제!
+  //- 또, delete하는 function의 라우터, 컨트롤러를 만들어야 함.
+  a(href=`${video.id}/delete`) Delete Video &rarr;
