@@ -1,6 +1,8 @@
  //정규식에 대한 MDN의 공식 문서 
  // https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_Expressions
 
+
+ // Video는 default export, formatHashtags는 default export 가 아님.
 import Video from "../models/Video";
 
 export const home = async(req, res) => {
@@ -41,7 +43,14 @@ export const postEdit = async (req, res) => {
       // 하지만 작성한 middleware는 
       //  videoUpdate를 위한 것에는 소용이 없을거다.
       // 뭐가 필요할까?
-    hashtags: hashtags.split(",").map((word) => (word.startsWith("#") ? word : `#${word}`)),
+
+      // findByIdAndUpdate를 위한 pre middleware는 없다.
+      // (반면에 findOneAndUpdate에 대한 middleware는 있음. 그러나 save hook을 호출하지는 않는다....)
+      // 그리고 findOneAndUpdate에서는 업데이트 하려는 문서에 접근할 수 없음.
+      // 우리는 save와 update에 저장하는 기능이 각각필요하다.
+
+      // https://mongoosejs.com/docs/middleware.html 참조!
+    hashtags: Video.formatHashtags(hashtags),
   });
   
   return res.redirect(`/videos/${id}`);
@@ -56,12 +65,9 @@ export const postUpload = async (req, res) => {
     await Video.create({
       title,
       description,
-      // 이제 hashtags를 변경해보려고 한다. 어떻게 될까??
-      // 이렇게 되면 hashtags는 array가 아닌 string이 된다. hashtags는 그저 문자열이니까
-      hashtags,
-      // 콘솔을 보면 hashtag가 저장되는 법도 다르게 된다. mongoose에서 배열로 설정해서 배열로 들어가긴 하지만, 하나의 문자열로
-      // 입력이 들어간다.
-      // 그럼 이제 hashtags array의 첫 element가 format되는 방식을 설정해보자. #이 들어가야 하니까 -> Video로!
+      // 이제 직접 만든 function이(해시태그 포매팅하는거) formatHashtags를 통해 접근이 가능하다.
+      // 이제 import뭐시기 할 필요가 없어진다!!!!
+      hashtags:Video.formatHashtags(hashtags),
     });
     return res.redirect("/");
   }

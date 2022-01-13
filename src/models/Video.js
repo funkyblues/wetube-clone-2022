@@ -1,6 +1,10 @@
 // db안에 영상들 지우는 방법!! : db.videos.remove({}) 이렇게 하면 된다.
 
 import mongoose from "mongoose";
+import videoRouter from "../routers/videoRouter";
+
+// 이건 이제 필요 없다 
+// export const formatHashtags = (hashtags) => hashtags.split(",").map((word) => (word.startsWith("#") ? word : `#${word}`));
 
 const videoSchema = new mongoose.Schema({
   title: {type: String, required: true, trim: true, maxlength: 80}, 
@@ -12,31 +16,20 @@ const videoSchema = new mongoose.Schema({
     rating: {type: Number, default: 0, required: true},
   },
 });
+// 더 나은것이 있다고 해서 이전의 코드는 지운다.
+// 그러면, 이전에 한 대로 해시태그 만드는 코드를 복붙해야하는데 귀찮고 오류가 생길 수 있는 위험이 있다.
 
-videoSchema.pre("save", async function() {
-  // https://mongoosejs.com/docs/middleware.html
-  // 여기보면 mongoose middleware에 관해서 정말 훌륭한 것이 있다.
-  // function 안에 this 라는 키워드가 있다.
-  // 이 this는 우리가 저장하고자 하는 문서를 가리킨다.
-  // 한번 확인해보자
+// 해결하기 위한 한 가지 옵션이 있다. 함수를 만드는 것이지. 이것도 나쁜 방법은 아니다. 괜춘.
+// 이렇게 해도 잘 작동된다
 
+// 하지만 Static 이란 것이 있대. 이걸 알려주려고 그랬나봐.
+// https://mongoosejs.com/docs/guide.html
+// Schema.static이랑 function, 만들고자 하는 static의 이름이 필요.
 
-  // console.log("We are about to save: ", this);
+videoSchema.static("formatHashtags", function(hashtags) {
+  return hashtags.split(",").map((word) => (word.startsWith("#") ? word : `#${word}`));
+});
 
-
-  // 이렇게 하면 우리가 upload를 통해 생성한 video에 대한 title, description, hashtags 및 meta 등등 데이터가 나온다.
-  // this.title = "Hahaha! I'm a middleware!!!" 
-
-  // 코드를 잘 읽어봐 이해할 수 있음 ㅎㅎ 
-  // 첫 번째 요소가 string이니까 받은 다음에 ,로 나누고  #이 있나 없나 확인 후 다시 배열 할당!
-  this.hashtags = this.hashtags[0].split(",").map((word) => word.startsWith("#") ? word : `#${word}`); // this.hashtags가 array이니까. [0]하면 string이 될 것이다.
-  // 잘 작동한다!
-  // 이것이 pre middleware를 save이벤트에 적용시킨 결과!
-  // 하지만 videoUpdate를 위한 것에는 소용이 없을거다.
-})
-
-
-// 중요! mongoose에선 middleware를 model이 생성되기 전에 만들어야 한다.
 
 const Video = mongoose.model("Video", videoSchema);
 export default Video;
