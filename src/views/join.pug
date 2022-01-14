@@ -1,11 +1,16 @@
 extends base 
 
 block content 
+  if errorMessage 
+    span=errorMessage
+    //- 이러면 errorMessage가 나온다.
   form(method="POST")
     //- name이 없으면 backend에서 쓸 수가 없다!!
     input(placeholder="Name", name="name", type="text", required)
     input(placeholder="Email", name="email", type="email", required)
     input(placeholder="Username", name="username", type="text", required)
     input(placeholder="Password", name="password", type="password", required)
+    //- 패스워드 확인을 위한 input!
+    input(placeholder="Confirm Password", name="confirmPassword", type="password", required)
     input(placeholder="Location", name="location", type="text", required)
     input(type="submit", value="Join")

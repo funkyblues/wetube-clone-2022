@@ -10,13 +10,31 @@ export const postJoin = async (req, res) => {
   // console.log(req.body);
   // res.end();
   // 아주 잘 작동하고 있음! ㅎ 
-  const { name, username, email, password, location } = req.body;
+  const { name, username, email, password, confirmPassword, location } = req.body;
+  const pageTitle = "Join"
+
+  if (password !== confirmPassword) {
+    // return을 붙여줘야 함수를 끝낼 수 있는걸 기억.
+    return res.render("join", { pageTitle, errorMessage: "Password confirmation does not match.",});
+  }
+
   // 입력한 username이 이미 사용중인지 체크해보자.
-  const usernameExists = await User.exists({username: username }); //username으로 써도 되는거 알지??
-  if(usernameExists) {
-    return res.render("join", { pageTitle: "Join", errorMessage: "This username is already taken.",});
+  // const usernameExists = await User.exists({username: username }); //username으로 써도 되는거 알지??
+  // 만약 username이 사용중이면 errorMessage를 보내도록.
+  
+  const exists = await User.exists({$or: [{ username }, { email }]});
+  
+  if(exists) {
+    return res.render("join", { pageTitle, errorMessage: "This username/email is already taken.",});
   };
 
+  // const emailExists = await User.exists({email});
+  // if (emailExists) {
+  //   return res.render("join", { pageTitle, errorMessage: "This email is already taken.",});
+  // }
+
+  // 지금 return res.render("join", { pageTitle, blabla }) 부분이 반복되고 있음
+  // 이렇게 만들고 싶지 않다면, mongodb의 $or operator를 사용할 수 있음.
 
   await User.create({
     name,
