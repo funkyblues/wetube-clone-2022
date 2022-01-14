@@ -3,6 +3,7 @@ import User from "../models/User";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 
+
 // postJoin은 아직 기능 x
 // 한번 테스트 해보자
 export const postJoin = async (req, res) => {
@@ -10,6 +11,13 @@ export const postJoin = async (req, res) => {
   // res.end();
   // 아주 잘 작동하고 있음! ㅎ 
   const { name, username, email, password, location } = req.body;
+  // 입력한 username이 이미 사용중인지 체크해보자.
+  const usernameExists = await User.exists({username: username }); //username으로 써도 되는거 알지??
+  if(usernameExists) {
+    return res.render("join", { pageTitle: "Join", errorMessage: "This username is already taken.",});
+  };
+
+
   await User.create({
     name,
     username,
