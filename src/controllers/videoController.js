@@ -32,9 +32,6 @@ export const postEdit = async (req, res) => {
   const { title, description, hashtags } = req.body;
   const video = await Video.exists({ _id:id });
   if (!video) {
-    // 브라우저는 방문한 웹사이트의 히스토리를 저장하는데, 상태코드를 400번대로 받으면 기록하지 않는다.
-    // 브라우저는 우리가 errorMessage를 내보내는 것을 모른다.
-    // 브라우저에게 상황을 전달할 수 있으니, 좋은 기능이지.
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
 
@@ -50,7 +47,6 @@ export const getUpload = (req, res) => {
   return res.render("upload", { pageTitle: "Upload Video"});
 };
 
-// videoController에서도 error가 발생할 수 있지.
 export const postUpload = async (req, res) => {
   const { title, description, hashtags } = req.body;
   try {
@@ -62,7 +58,6 @@ export const postUpload = async (req, res) => {
     return res.redirect("/");
   }
   catch(error) {
-    // 이렇게 알맞은 상태코드를 보내주는 것은 정말 중요하다.
     return res.status(400).render("upload", { pageTitle: "Upload Video", errorMessage: error._message, });
   }
 };
