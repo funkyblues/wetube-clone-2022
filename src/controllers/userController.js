@@ -31,10 +31,6 @@ export const getLogin = (req, res) => {
   res.render("login", { pageTitle: "Login" });
 }
 
-// 유저가 로그인하면 그 유저에 대한 정보를 세션에 담을 것이다.
-// req.session은 모든 브라우저에 존재하니까, 이제 모든 브라우저에서 req.session을 사용할 수 있는 것임!
-// 로그인된 user정보를 사용할 수 있다는 것!!
-
 export const postLogin = async (req, res) => {
   const { username, password } = req.body;
   const pageTitle = "Login";
@@ -47,6 +43,9 @@ export const postLogin = async (req, res) => {
   if (!ok) {
     return res.status(400).render("login", { pageTitle, errorMessage:"Wrong password" });
   }
+
+  // 여기가 바로 우리가 세션을 수정하는 곳임.
+  // 이 두 줄이 실제로 세션을 initialize(초기화) 하는 부분!
   req.session.loggedIn = true;
   req.session.user = user;
   return res.redirect("/");

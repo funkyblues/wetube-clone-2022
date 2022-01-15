@@ -18,18 +18,31 @@ app.use(express.urlencoded({ extended:true }));
 app.use(
   session({
     secret: "Hello!", 
-    resave: true,
-    saveUninitialized: true,
-    // 이제 우리의 세션들은 MongoDB database에 저장되게 된다.
-    // 세션은 어떻게 만들어질까? -> 브라우저가 우리의 backend를 방문할 때 만들어진다.
-    // 새로고침하면 만들어져 있다. 2주동안 기억하겠다는 내용의 expires요소도 있따.
-    // 로그인을 하면, 이미 있던 session에 사용자 정보가 들어간다.
+    // resave와 saveUninitialize의 차이점을 알아보자. 
+    // 그리고 이것들을 false로 바꾸는 것에 대해 알아보자.
+    // session authentication을 사용하면서 생길 수 있는 문제에 대해 배울 수 있기 때문.
 
-    // 그럼 backend를 껐다가 켜면 어떻게 될까. 똑같지.
-    // 여전히 로그인된 상태로 있다. 로그인 정보는 이제 mongodb에 있기 때문이다.
-    // store: MongoStore 덕분에 mongodb storage에 사용자 세션을 저장하게 되는 것.
+    // 방문한 모든 사람들의 session을 DB에 모두 저장하는데, 그것은 좋은 생각이 아니다.
+    // 아마 로그인한 사용자의 session만 저장하는 것이 좋을 것.
+    // 서버는 로그인 하지 않으면 쿠키를 주지 않고 로그인 하면 쿠키를 넘겨주는 걸로 할 거다.
 
-    // 이 부분을 없애면 session은 서버의 메모리에 저장된다. 그러면 서버를 재시작할 때 마다 메모리가 지워지므로 세션들을 database안에 저장하도록 한 것이다.
+    // resave랑 saveUninitialized를 false로 해보자.
+    // 그러면 이제 sessions db엔 세션이 저장되지 않는다.
+    // uninitialized: 세션이 새로 만들어지고 수정된 적이 없을 때를 말함.
+
+    // 세션은 어디서 수정할까? -> userController에서!!
+    resave: false,
+    saveUninitialized: false,
+    // resave, saveUninitialized: false가 하는 것은, 세션을 수정할 때만 세션을 DB에 저장하고 
+    // 쿠키를 넘겨주는 것. 우리는 로그인 할 때만 세션을 수정하고 있따.
+    // 다시 말하자면, backend가 로그인한 사용자에게만 쿠키를 주도록 설정되었다는 의미!
+
+    // 안드로이드 앱이나 iOS앱을 만들 때 얘내들은 쿠키를 갖지 않기 때문에 token을 사용한다.
+    // 하지만 여기선 브라우저에서 인증을 하니까 쿠키를 이용한 세션인증을 할 수 있다.
+
+    // (물론 브라우저에서 token을 사용해도 되지만 이는 심화내용이라 별개의 공부를 해야함(강의))
+
+    // 이제 우리는 기억하고 싶은 사람들에게만 쿠키를 주게 된다. 바로 우리 유저.
     store: MongoStore.create({
       mongoUrl: "mongodb://127.0.0.1:27017/wetube"
     }),
