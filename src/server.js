@@ -1,3 +1,14 @@
+// console.log(process.env.COOKIE_SECRET, process.env.DB_URL);
+// 이 라인을 작성하고 나면, process.env에 우리가 설정한 변수들이 저장이 된다.
+// require("dotenv").config();
+// id랑 db url주소가 잘 나온다.
+// 이건 가능한 한 빨리 써줘야 함.
+// console.log(process.env.COOKIE_SECRET, process.env.DB_URL);
+
+
+// 잘 작동한다~
+// console.log(process.env.DB_URL);
+
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
@@ -18,7 +29,7 @@ app.use(express.urlencoded({ extended:true }));
 
 
 //undefined라고 뜬다.
-console.log(process.env.COOKIE_SECRET);
+// console.log(process.env.COOKIE_SECRET);
 
 
 app.use(
