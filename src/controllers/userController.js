@@ -32,6 +32,9 @@ export const getLogin = (req, res) => {
 }
 
 // 유저가 로그인하면 그 유저에 대한 정보를 세션에 담을 것이다.
+// req.session은 모든 브라우저에 존재하니까, 이제 모든 브라우저에서 req.session을 사용할 수 있는 것임!
+// 로그인된 user정보를 사용할 수 있다는 것!!
+
 export const postLogin = async (req, res) => {
   const { username, password } = req.body;
   const pageTitle = "Login";

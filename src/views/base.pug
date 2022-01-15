@@ -6,10 +6,6 @@ html(lang="ko")
   body 
     header 
       h1 #{pageTitle}
-      //- locals object를 쓰려면 그냥 이렇게만 하면된다.
-      //- Who is sexy? you가 나온다 ㅋㅋㅋ
-      //- 이런 방식으로 templates와 data를 공유할 생각이다.
-      //- 반드시 locals object안에 있어야 해!!!
       nav 
         ul 
           li
@@ -17,7 +13,6 @@ html(lang="ko")
           if loggedIn
             li 
               a(href="/logout") Log Out
-              //- 유저가 로그인 되어 있다면 loggedInUser값이 있다는 의미이므로
             li 
               a(href="/my-profile") #{loggedInUser.name}의 Profile
           else
