@@ -1,16 +1,26 @@
 doctype html 
 html(lang="ko")
   head
-    title #{pageTitle} | WeTube
+    title #{pageTitle} | #{siteName}
     link(rel="stylesheet" href="https://unpkg.com/mvp.css")
   body 
     header 
-      h1=pageTitle
+      h1 #{pageTitle}
+      //- locals object를 쓰려면 그냥 이렇게만 하면된다.
+      //- Who is sexy? you가 나온다 ㅋㅋㅋ
+      //- 이런 방식으로 templates와 data를 공유할 생각이다.
+      //- 반드시 locals object안에 있어야 해!!!
       nav 
         ul 
           li
             a(href="/") Home
-          if !req.session.loggedIn
+          if loggedIn
+            li 
+              a(href="/logout") Log Out
+              //- 유저가 로그인 되어 있다면 loggedInUser값이 있다는 의미이므로
+            li 
+              a(href="/my-profile") #{loggedInUser.name}의 Profile
+          else
             li 
               a(href="/join") Join
             li 
