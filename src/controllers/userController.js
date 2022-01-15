@@ -50,6 +50,29 @@ export const postLogin = async (req, res) => {
   req.session.user = user;
   return res.redirect("/");
 };
+
+export const startGithubLogin = (req, res) => {
+  const baseUrl = "https://github.com/login/oauth/authorize";
+  const config = {
+    client_id: "e8f91d70327c76f70688",
+    allow_signup: false,
+    // scope는 space로 띄워서!
+    scope: "read:user user:email",
+  };
+  // 이렇게 만든 config를 합쳐서 사용하자.
+  // URLSearchParams utility를 사용할 것이다.
+  // new URLSearchParams(config).toString()해주면, 멋진 URL이 나온다~
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${baseUrl}?${params}`;
+  // 이후 우리가 (참조) 링크에서 설정한 대로 user를 callback url로 redirect 해준다.
+  // 그리고 user에게 code를 같이 보내준다. (이 코드는 나중에 사용할 예정!)
+  return res.redirect(finalUrl);
+};
+
+export const finishGithubLogin = (req, res) => {
+
+};
+
 export const edit = (req, res) => res.send("Edit User");
 export const remove = (req, res) => res.send("Remove User");
 export const logout = (req, res) => res.send("Log Out");

@@ -19,8 +19,15 @@ block content
     //- parameter들을 더 보내보자
 
     //- scope: 내가 사용자에 대해 어디까지 알 수 있는지를 적으면 된다. 그러니까 사용자가 정보를 어디까지 공유해야하는지
+    //- 유저에게서 얼마나 많이 정보를 읽어내고 어떤 정보를 가져올 것인가에 대한 것
+    //- scope 들어가보면 여러 정보들이 많이 있다. user항복을 사용!
+    //- 결국 이 scope parameter에 따라 얻을 수 있는 정보가 달라진다는 것. URL에 계속 담아주면 되는데,
+    //- 문제점은 이 긴 URL을 계속 변경해줘야 한다는 것.
+    //- 그리고 오타가 발생한다면... 끔찍하지.
+    //- 그러니 바꿔봅시다.
+
     //- allow_signup: GitHub 사용자가 아니면 회원가입(계정생성)을 시킬지 아닐지의 여부!
-    a(href="https://github.com/login/oauth/authorize?client_id=e8f91d70327c76f70688&allow_signup=false") Continue with GitHub &rarr;
+    a(href="/users/github/start") Continue with GitHub &rarr;
 
     //- 2. user는 GitHub에 의해 내 사이트로 redirect 된다.
   hr
