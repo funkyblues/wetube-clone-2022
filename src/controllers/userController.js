@@ -72,41 +72,6 @@ export const finishGithubLogin = async (req, res) => {
   };
   const params = new URLSearchParams(config).toString();
   const finalUrl = `${baseUrl}?${params}`;
-
-
-  /*
-  밑의 await 코드는, 다음과 같이 쓸 수도 있다.
-  fetch(x).then(response => response.json()).then(json => access_token)
-  근데 이렇게 쓰는 건 좋지 않다. 왜냐?
-  이렇게 하면 우린 .then안으로 들어가야 access_token을 얻을 수 있는데,
-  그 줄에서 다시 fetch를 해야한다는 소리가 되기 때문. 그래도 일단 해보자.
-  */ 
-  // fetch(finalUrl, {
-  //   method:"POST",
-  //   headers: {
-  //     Accept: "application/json",
-  //   },
-  // }).then(response => response.json()).then(json => {
-  //   if ("access_token" in tokenRequest) {
-  //     const { access_token } = tokenRequest;
-  //     const apiUrl = "https://api.github.com"
-  //     fetch(`${apiUrl}/user`, {
-  //         headers: {
-  //           Authorization: `token ${access_token}`,
-  //         },
-  //         // 그리고 이 부분에 .then(json => {});을 쓰면 이 부분에서 user데이터를 가져올 수 있다.
-  //       }).then(response => response.json()).then(json => {
-  //       fetch(`${apiUrl}/user/emails`, {
-  //         headers: {
-  //           Authorization: `token ${access_token}`,
-  //         },
-  //       });
-  //     });
-  //   }
-  // });
-
-  // 어으 넘 복잡해. 이건 좋은 생각이 아냐. then을 쓰는 대신 async await를 쓰자.
-
   const tokenRequest = await( 
     await fetch(finalUrl, {
       method:"POST",
@@ -145,22 +110,68 @@ export const finishGithubLogin = async (req, res) => {
     // console.log(emailData);
 
     // email 잘 나오는데, 이것들 중 primary인 것과, verified인 것을 확인하자.
-    const email = emailData.find(email => email.primary === true && email.verified === true);
-    if (!email) {
+    // emailObj는 primary===true와 verified===true인 것들만 모아둔 객체!!
+    const emailObj = emailData.find(email => email.primary === true && email.verified === true);
+    if (!emailObj) {
       return res.redirect("/login");
-      // 나중에는 에러 notification을 보여주며 redirect 시켜볼거임
     }
-    // 여긴 email이 primary & verified
-    // user데이터도 받을 거여
-    // 그러니 user를 로그인 시키거나, 계정을 생성시킬 수 있음. 왜냐면 email이 없다는 뜻일 테니까(???)
 
-    // 그리고 동일한 user email은 갖고 있지만 한 명은 일반 password로 로그인하고 다른 한명은 GitHub로 로그인하는 user를 어떻게 다룰 지 알아볼거임
+    // 기존 user에서 찾겠다.
+    const existingUser = await User.findOne({email: emailObj.email});
 
-    // email과 password로 계정을 생성한 user가 GitHub로 로그인 하려고 하면 어떻게 할 것인지 생각....
-    // 그리고 똑같은 email이 있다면... 
-      // 두 개의 계정??
-      // 계정들을 하나로 통합??
-      // user에게 이미 해당 email로 만든 계정이 있다고 에러??
+    // 만일 해당 email을 가지는 user가 이미 있다면, 로그인 시키겠다!
+
+    // 와 잘 된다 ㄷㄷ
+    // 만약 mongodb에서 유저를 지운다면?
+
+    if (existingUser) {
+      req.session.loggedIn = true;
+      req.session.user = existingUser;
+      return res.redirect("/");
+    }
+
+    // DB에 해당 email을 가진 user가 없을 때
+    // 나중에 여기에서는 계정 생성하는 것을 추가해야 한다.
+    // 해당 email로 user가 없으니, 계정을 생성해야한다는 뜻.
+
+    else {
+      const user = await User.create({
+        name: userData.name? userData.name : "Unknown",
+        username: userData.login,
+        email: emailObj.email,
+        // GitHub계정을 통해 만들었다면 password가 없는 것이지.
+        // 그러니, username, password form을 쓸 수 없고 socialOnly가 true인 것을 알려주엉 ㅑ한다.
+        password: "",
+        socialOnly: true,
+        location: userData.location? userData.location : "Unknown",
+      });
+      req.session.loggedIn = true;
+      req.session.user = user;
+      return res.redirect("/");
+
+      // 이렇게 하면 잘 들어온다.
+      // mongoDB에 사용자 보면 name은 github 프로필에 저장해둔 이름, username은 github 이름
+      // 패스워드는 비어있는 해시값, email은 github 이메일 등등.....
+    }
+
+    // 이전 강의에서 이어서..
+    // DB에 username과 password가 저장되어 있다면, 그걸로 로그인 하면 되지만
+    // 만약 GitHub으로 로그인 버튼을 누르게 되면, GitHub으로 로그인 한 user는 DB상에서 똑같은 email과 password를 가진 user를 받게 된다.
+    
+    // 정리하자면, 내 웹사이트에서 email과 password로 계정 생성 후 
+    // 1달 뒤에 와서 GitHub으로 로그인 시도. GitHub은 email을 줄것이고..
+    // 근데 email이 똑같다면? 어떻게??
+
+    // 1. 이미 동일한 email이 있으니 그것으로 로그인 해야한다.
+    // 2. 똑같은 email이 있다는 걸 증명했으니 GitHub로 로그인해도 된다. 고 할 수도있다.
+
+    // 즉 password가 있거나 GitHub의 email이 Verified된 것이라면 사용자가 email의 주인이라는 뜻이니 로그인 시켜도 된다.
+    // 또 예를 들어 GitHub Login으로 계정을 만든 user가 있을 때(즉, email은 있지만 password가 없는 경우), 로그인 화면에서 user에게 email은 있지만 password가 없다고 말해줘야 한다.
+    // 이것은 그들이 GitHub으로 로그인해야한다는 뜻.
+
+
+    // 그러니까 이제 뭘 할거냐면, 만약 primary인 email을 받고 DB에서 같은 email을 가진 user를 발견하면 그 user를 로그인 시켜주겠다.
+    // 사실 email은 객체. 이 객체가 필요하다.
   }
   else {
     return res.redirect("/login");
