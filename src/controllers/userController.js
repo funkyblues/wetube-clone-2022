@@ -1,5 +1,4 @@
 import User from "../models/User";
-// nodeJS에선 fetch를 사용할 수 없으니, 이렇게!
 import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 import { token } from "morgan";
@@ -47,8 +46,6 @@ export const postLogin = async (req, res) => {
     return res.status(400).render("login", { pageTitle, errorMessage:"Wrong password" });
   }
 
-  // 여기가 바로 우리가 세션을 수정하는 곳임.
-  // 이 두 줄이 실제로 세션을 initialize(초기화) 하는 부분!
   req.session.loggedIn = true;
   req.session.user = user;
   return res.redirect("/");
@@ -59,105 +56,115 @@ export const startGithubLogin = (req, res) => {
   const config = {
     client_id: process.env.GH_CLIENT,
     allow_signup: false,
-    // scope는 space로 띄워서!
     scope: "read:user user:email",
   };
-  // 이렇게 만든 config를 합쳐서 사용하자.
-  // URLSearchParams utility를 사용할 것이다.
-  // new URLSearchParams(config).toString()해주면, 멋진 URL이 나온다~
   const params = new URLSearchParams(config).toString();
   const finalUrl = `${baseUrl}?${params}`;
-  // 이후 우리가 (참조) 링크에서 설정한 대로 user를 callback url로 redirect 해준다.
-  // 그리고 user에게 code를 같이 보내준다. (이 코드는 나중에 사용할 예정!)
   return res.redirect(finalUrl);
 };
 
-// 2. user는 GitHub에 의해 내 사이트로 redirect 된다. -> GitHub에서 받은 토큰을 Access 토큰으로 바꿔줘야한다.
 export const finishGithubLogin = async (req, res) => {
   const baseUrl = "https://github.com/login/oauth/access_token";
   const config = {
     client_id: process.env.GH_CLIENT,
     client_secret: process.env.GH_SECRET,
-    // URL에 담겨오는 code!
     code: req.query.code,
-    // 받은 code를 access_token으로 바꿔주자.
-    // 이 바꾼 access_token으로 GitHub API를 이용해서 user의 정보를 가져올 수 있다.
   };
-  // 잘 보내고 있네!
-  // console.log(config);
-  // 이제 config들을 URL로 다시 넣어야 한다. 왜냐면 또 다른 request를 보내야 하기 때문
   const params = new URLSearchParams(config).toString();
   const finalUrl = `${baseUrl}?${params}`;
 
-  // finalUrl에 POST request를 보낸다.
-  // 그 후 fetch해서 data를 받아오고,
 
-  // 근데 여기서 오류 남. fetch is not defined. 정의가 되어있지 않다. fetch는 브라우저에서만 사용 가능.
-  // 문제는 fetch기능이 NodeJS에는 포함되어 있지 않다.
-  // 자바스크립트를 쓰고 있어도 function이 똑같지는 않다.
+  /*
+  밑의 await 코드는, 다음과 같이 쓸 수도 있다.
+  fetch(x).then(response => response.json()).then(json => access_token)
+  근데 이렇게 쓰는 건 좋지 않다. 왜냐?
+  이렇게 하면 우린 .then안으로 들어가야 access_token을 얻을 수 있는데,
+  그 줄에서 다시 fetch를 해야한다는 소리가 되기 때문. 그래도 일단 해보자.
+  */ 
+  // fetch(finalUrl, {
+  //   method:"POST",
+  //   headers: {
+  //     Accept: "application/json",
+  //   },
+  // }).then(response => response.json()).then(json => {
+  //   if ("access_token" in tokenRequest) {
+  //     const { access_token } = tokenRequest;
+  //     const apiUrl = "https://api.github.com"
+  //     fetch(`${apiUrl}/user`, {
+  //         headers: {
+  //           Authorization: `token ${access_token}`,
+  //         },
+  //         // 그리고 이 부분에 .then(json => {});을 쓰면 이 부분에서 user데이터를 가져올 수 있다.
+  //       }).then(response => response.json()).then(json => {
+  //       fetch(`${apiUrl}/user/emails`, {
+  //         headers: {
+  //           Authorization: `token ${access_token}`,
+  //         },
+  //       });
+  //     });
+  //   }
+  // });
+
+  // 어으 넘 복잡해. 이건 좋은 생각이 아냐. then을 쓰는 대신 async await를 쓰자.
+
   const tokenRequest = await( 
     await fetch(finalUrl, {
       method:"POST",
       headers: {
-
-      // 이게 없으면 Github는 text로 응답할 것임.
-      // 우린 JSON이 필요하니 이 부분을 복사해서 headers안에 붙여넣기 수행
         Accept: "application/json",
     }
   })
   ).json();
-  // 받아온 data에서 JSON을 추출한다.
-  // const json = await data.json();
-  // console.log(json);
   if ("access_token" in tokenRequest) {
-    // access api
     const { access_token } = tokenRequest;
+    const apiUrl = "https://api.github.com"
+    const userData = await (
+      // access_token이 있으면, 아래 URL에서 GitHub API를 사용할 수 있다.
+      // 우리가 scope에 명시한 내용에 대해서만 가능.
 
-    // fetch를 할 때 까지 기다리고, json()으로 받을 때 까지 기다린다. 뭐 이런 뜻으로 이해.
-    const userRequest = await (
-      await fetch("https://api.github.com/user", {
+      // user의 email을 요청하기 위해 똑같은 access_token을 사용해야 한다.
+      // (참조) GitHub rest api에서 Emails에 List email addresses for the authenticated user항목에서 찾음
+
+      await fetch(`${apiUrl}/user`, {
         headers: {
           Authorization: `token ${access_token}`,
         },
       })
     ).json();
+    // console.log(userData);
 
-    // 그 후 userRequest를 한번 확인해보자
-    console.log(userRequest);
-    
-    // GitHub 프로필 정보를 가져왔음!!
-    // 콘솔 창에 잘 나타나는 것을 볼 수 있음.
-    // 근데 내 email이 null이여...?
-    // 무슨 뜻이냐면 내 email이 없거나 private이란 소리
-    // 그래서 email값이 null일 때를 대비해서 또 다른 request를 만들어야 한다.
+    // user의 email을 봅시다.
+    const emailData = await (
+      await fetch(`${apiUrl}/user/emails`, {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+    // user의 email을 봅시다.
+    // console.log(emailData);
+
+    // email 잘 나오는데, 이것들 중 primary인 것과, verified인 것을 확인하자.
+    const email = emailData.find(email => email.primary === true && email.verified === true);
+    if (!email) {
+      return res.redirect("/login");
+      // 나중에는 에러 notification을 보여주며 redirect 시켜볼거임
+    }
+    // 여긴 email이 primary & verified
+    // user데이터도 받을 거여
+    // 그러니 user를 로그인 시키거나, 계정을 생성시킬 수 있음. 왜냐면 email이 없다는 뜻일 테니까(???)
+
+    // 그리고 동일한 user email은 갖고 있지만 한 명은 일반 password로 로그인하고 다른 한명은 GitHub로 로그인하는 user를 어떻게 다룰 지 알아볼거임
+
+    // email과 password로 계정을 생성한 user가 GitHub로 로그인 하려고 하면 어떻게 할 것인지 생각....
+    // 그리고 똑같은 email이 있다면... 
+      // 두 개의 계정??
+      // 계정들을 하나로 통합??
+      // user에게 이미 해당 email로 만든 계정이 있다고 에러??
   }
   else {
-    // access_token이 없으면 redirect
-
-    // 오류를 내야하는게 맞지만 일단은 login으로 redirect!
-    // 그러나 이렇게하면 user에게 notification을 보낼 수 없음.(이건 나중에 해볼 거라고..)
-
-    // notification을 보며 어떻게 redirect하는지...?? (추후 강의)
     return res.redirect("/login");
   }
-
-
-
-  // 이렇게 해야 프론트엔드에서 볼 수 있기 때문!! 기억
-  res.send(JSON.stringify(json));
-  // 우리 화면 상에 잘 보인다. GitHub 벡엔드에 request를 보내니 access_token이 생겼음
-  // finalURL로 부터 받아온 데이터를 json화 하여 볼 수 있게 되었다.
-
-  // 3. Use the access token to access the API
-  // 이제 access_token을 가지고 user의 정보를 얻을 수 있다.
-  // https://api.github.com/user 이 GET URL을 통해 인증을 위한 access_token을 보내줘야 한다.
-  
-  
-  /*빠른 복습
-  1. GitHub에 user를 보낸다.
-  2. user가 GitHub에서 예라고 하면 GitHub이 코드를 보내준다.
-  3. 우리는 그 코드를 가지고 access_token으로 바꾸었다.
-  4. access_token으로 GitHub API를 사용하여 user 정보를 가져온다.*/ 
 };
 
 export const edit = (req, res) => res.send("Edit User");
