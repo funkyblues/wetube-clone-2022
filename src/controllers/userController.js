@@ -1,5 +1,8 @@
 import User from "../models/User";
+// nodeJS에선 fetch를 사용할 수 없으니, 이렇게!
+import fetch from "node-fetch";
 import bcrypt from "bcrypt";
+import { token } from "morgan";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -77,6 +80,8 @@ export const finishGithubLogin = async (req, res) => {
     client_secret: process.env.GH_SECRET,
     // URL에 담겨오는 code!
     code: req.query.code,
+    // 받은 code를 access_token으로 바꿔주자.
+    // 이 바꾼 access_token으로 GitHub API를 이용해서 user의 정보를 가져올 수 있다.
   };
   // 잘 보내고 있네!
   // console.log(config);
@@ -90,17 +95,69 @@ export const finishGithubLogin = async (req, res) => {
   // 근데 여기서 오류 남. fetch is not defined. 정의가 되어있지 않다. fetch는 브라우저에서만 사용 가능.
   // 문제는 fetch기능이 NodeJS에는 포함되어 있지 않다.
   // 자바스크립트를 쓰고 있어도 function이 똑같지는 않다.
-  const data = await fetch(finalUrl, {
-    method:"POST",
-    headers: {
+  const tokenRequest = await( 
+    await fetch(finalUrl, {
+      method:"POST",
+      headers: {
+
       // 이게 없으면 Github는 text로 응답할 것임.
       // 우린 JSON이 필요하니 이 부분을 복사해서 headers안에 붙여넣기 수행
-      Accept: "application/json",
+        Accept: "application/json",
     }
-  });
+  })
+  ).json();
   // 받아온 data에서 JSON을 추출한다.
-  const json = await data.json();
-  console.log(json);
+  // const json = await data.json();
+  // console.log(json);
+  if ("access_token" in tokenRequest) {
+    // access api
+    const { access_token } = tokenRequest;
+
+    // fetch를 할 때 까지 기다리고, json()으로 받을 때 까지 기다린다. 뭐 이런 뜻으로 이해.
+    const userRequest = await (
+      await fetch("https://api.github.com/user", {
+        headers: {
+          Authorization: `token ${access_token}`,
+        },
+      })
+    ).json();
+
+    // 그 후 userRequest를 한번 확인해보자
+    console.log(userRequest);
+    
+    // GitHub 프로필 정보를 가져왔음!!
+    // 콘솔 창에 잘 나타나는 것을 볼 수 있음.
+    // 근데 내 email이 null이여...?
+    // 무슨 뜻이냐면 내 email이 없거나 private이란 소리
+    // 그래서 email값이 null일 때를 대비해서 또 다른 request를 만들어야 한다.
+  }
+  else {
+    // access_token이 없으면 redirect
+
+    // 오류를 내야하는게 맞지만 일단은 login으로 redirect!
+    // 그러나 이렇게하면 user에게 notification을 보낼 수 없음.(이건 나중에 해볼 거라고..)
+
+    // notification을 보며 어떻게 redirect하는지...?? (추후 강의)
+    return res.redirect("/login");
+  }
+
+
+
+  // 이렇게 해야 프론트엔드에서 볼 수 있기 때문!! 기억
+  res.send(JSON.stringify(json));
+  // 우리 화면 상에 잘 보인다. GitHub 벡엔드에 request를 보내니 access_token이 생겼음
+  // finalURL로 부터 받아온 데이터를 json화 하여 볼 수 있게 되었다.
+
+  // 3. Use the access token to access the API
+  // 이제 access_token을 가지고 user의 정보를 얻을 수 있다.
+  // https://api.github.com/user 이 GET URL을 통해 인증을 위한 access_token을 보내줘야 한다.
+  
+  
+  /*빠른 복습
+  1. GitHub에 user를 보낸다.
+  2. user가 GitHub에서 예라고 하면 GitHub이 코드를 보내준다.
+  3. 우리는 그 코드를 가지고 access_token으로 바꾸었다.
+  4. access_token으로 GitHub API를 사용하여 user 정보를 가져온다.*/ 
 };
 
 export const edit = (req, res) => res.send("Edit User");
