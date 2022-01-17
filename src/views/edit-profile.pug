@@ -1,0 +1,20 @@
+extends base
+
+block content 
+  //- 이 form의 action은 같은 url한테 갈 것이다.
+  //- 그러니까 /users/edit 여기로/
+  //- 그러니 굳이 action을 입력안해도 된다. action을 입력하지 않으면, 브라우저가 같은 url에 post request를 보내려는 것을 알기때문
+  form(method="POST")
+    input(placeholder="Name", name="name", type="text", required, value=loggedInUser.name)
+    input(placeholder="Email", name="email", type="email", required, value=loggeInUser.email)
+    input(placeholder="Username", name="username", type="text", required, value=loggedInUser.username)
+    input(placeholder="Location", name="location", type="text", required, value=loggedInUser.location)
+    //- 비밀번호 창은 따로 만들거야 왜?
+    //- 비밀번호가 있는 사용자가 있고 없는 사용자가 있기 때문.
+    input(type="submit", value="Update Profile")
+    //- edit은 수정하는 것이기 때문에, 현재 프로필을 볼 수 있어야 한다.
+    //- 그러니 user object를 이 template으로 가져와 보자. 어떻게??
+
+    //- 우리에겐 middleware가 있다. middleware.js를 보면, 이 middleware가 현재 로그인 된 사용자를 알려준다.
+    //- 그러니 이 정보를 굳이 userController에 보낼 필요 없다. locals를 통해서 loggedInUser를 사용할 수 있으므로.
+    //- 그러니 위에다가 value를 추가하면 된다. (이미 추가되어 있겠지)

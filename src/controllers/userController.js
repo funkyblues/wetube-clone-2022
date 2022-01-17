@@ -1,7 +1,6 @@
 import User from "../models/User";
 import fetch from "node-fetch";
 import bcrypt from "bcrypt";
-import { token } from "morgan";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -76,6 +75,8 @@ export const finishGithubLogin = async (req, res) => {
   const tokenRequest = await( 
     await fetch(finalUrl, {
       method:"POST",
+      // headers를 쓰는 이유
+      // (참조) https://developer.mozilla.org/ko/docs/Web/HTTP/Headers
       headers: {
         Accept: "application/json",
     }
@@ -105,12 +106,7 @@ export const finishGithubLogin = async (req, res) => {
     }
 
     let user = await User.findOne({email: emailObj.email});
-    // DB에 있는 email과 GitHub에서 받아온 email이 같다면 로그인 시켜줘!
-
-    // 웹사이트에서 username과 password 등등 form으로 로그인한 사람은, github email이 기입한 것과 같다면
-    // GitHub으로 로그인해도 로그인이 될 것이다.
     if (!user) {
-      // 만약 user를 못 찾았다면 user를 새로만들어서 user를 정의할 거야
       user = await User.create({
         avatarUrl: userData.avatar_url,
         name: userData.name? userData.name : "Unknown",
@@ -121,7 +117,6 @@ export const finishGithubLogin = async (req, res) => {
         location: userData.location? userData.location : "Unknown",
       });
     }
-      // 만들고 나면 로그인 시켜줘!
       req.session.loggedIn = true;
       req.session.user = user;
       return res.redirect("/");
@@ -131,9 +126,14 @@ export const finishGithubLogin = async (req, res) => {
   }
 };
 
-export const edit = (req, res) => res.send("Edit User");
+export const getEdit = (req, res) => {
+  return res.render("edit-profile", { pageTitle: "Edit Profile" });
+};
+export const postEdit = (req, res) => {
+  return res.render("edit-profile");
+};
 export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
-}
+};
 export const see = (req, res) => res.send("See User");

@@ -10,11 +10,12 @@ html(lang="ko")
         ul 
           li
             a(href="/") Home
+            //- 참고로 loggedIn은 locals에 있는 변수!
           if loggedIn
+            li
+              a(href="/users/edit") Edit Profile
             li 
               a(href="/users/logout") Log Out
-            li 
-              a(href="/my-profile") #{loggedInUser.name}의 Profile
           else
             li 
               a(href="/join") Join
